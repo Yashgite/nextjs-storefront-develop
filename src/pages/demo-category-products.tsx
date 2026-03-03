@@ -1,4 +1,7 @@
 // src/pages/demo-category-products.tsx
+import { useState } from 'react'
+import FavoriteBorderOutlinedIcon from '@mui/icons-material/FavoriteBorderOutlined'
+import FavoriteIcon from '@mui/icons-material/Favorite'
 
 import { useRouter } from 'next/router'
 import { NextPage } from 'next'
@@ -12,7 +15,7 @@ import {
   CardContent,
   CardMedia,
   IconButton,
-  Button, 
+  Button,
   useTheme,
   useMediaQuery,
 } from '@mui/material'
@@ -24,7 +27,12 @@ import { productGetters } from '@/lib/getters'
 import type { Product } from '@/lib/gql/types'
 import { useCategoryProducts } from '@/hooks/custom/useCategoryProducts/useCategoryProducts'
 
+
+
+
 const DemoCategoryProductsPage: NextPage = () => {
+const [wishlist, setWishlist] = useState<string[]>([])
+
   const router = useRouter()
   const categoryCode = (router.query.categoryCode as string) || ''
 
@@ -39,13 +47,28 @@ const DemoCategoryProductsPage: NextPage = () => {
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
   const isTablet = useMediaQuery(theme.breakpoints.between('sm', 'md'))
 
+  const handleWishlistToggle = (productCode: string) => {
+    setWishlist((prev) =>
+      prev.includes(productCode)
+        ? prev.filter((code) => code !== productCode) // remove
+        : [...prev, productCode] // add
+    )
+  }
+
   const scroll = (direction: 'left' | 'right') => {
     if (!scrollRef.current) return
-
-    const containerWidth = scrollRef.current.clientWidth
-
-    scrollRef.current.scrollBy({
-      left: direction === 'left' ? -containerWidth : containerWidth,
+  
+    const container = scrollRef.current
+    const firstCard = container.children[0] as HTMLElement
+  
+    if (!firstCard) return
+  
+    const cardWidth = firstCard.offsetWidth
+    const gap = 16 // because gap={2} in MUI = 16px
+    const scrollAmount = cardWidth + gap
+  
+    container.scrollBy({
+      left: direction === 'left' ? -scrollAmount : scrollAmount,
       behavior: 'smooth',
     })
   }
@@ -142,7 +165,7 @@ const DemoCategoryProductsPage: NextPage = () => {
                   sx={{
                     borderRadius: 4,
                     boxShadow: 1,
-                    height: 380, // Slightly increased for buttons
+                    height: 380,
                     display: 'flex',
                     flexDirection: 'column',
                     p: 1,
@@ -176,14 +199,33 @@ const DemoCategoryProductsPage: NextPage = () => {
                     )}
                   </Box>
 
+
                   <CardContent sx={{ p: 1, flexGrow: 1 }}>
-                    <Typography
-                      variant="subtitle2"
-                      fontWeight={600}
-                      noWrap
-                    >
-                      {name}
-                    </Typography>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <Typography
+                        variant="subtitle2"
+                        fontWeight={600}
+                        noWrap
+                      >
+                        {name}
+                      </Typography>
+
+                      <Box
+                        onClick={() => handleWishlistToggle(product?.productCode as string)}
+                        sx={{
+                          cursor: 'pointer',
+                          display: 'flex',
+                          alignItems: 'center',
+                        }}
+                      >
+                        {wishlist.includes(product?.productCode as string) ? (
+                          <FavoriteIcon sx={{ color: 'red' }} />
+                        ) : (
+                          <FavoriteBorderOutlinedIcon />
+                        )}
+                      </Box>
+                    </Box>
+
 
                     {shortDescription && (
                       <Typography
@@ -210,7 +252,7 @@ const DemoCategoryProductsPage: NextPage = () => {
                     >
                       $ {price.special || price.regular}
                     </Typography>
- 
+
                     <Box
                       mt={2}
                       display="flex"
