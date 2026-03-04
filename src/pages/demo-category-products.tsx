@@ -1,37 +1,16 @@
 // src/pages/demo-category-products.tsx
-import { useState } from 'react'
-import FavoriteBorderOutlinedIcon from '@mui/icons-material/FavoriteBorderOutlined'
-import FavoriteIcon from '@mui/icons-material/Favorite'
-
+import { useState, useRef } from 'react'
 import { useRouter } from 'next/router'
 import { NextPage } from 'next'
-import { useRef } from 'react'
-
-import {
-  Box,
-  CircularProgress,
-  Typography,
-  Card,
-  CardContent,
-  CardMedia,
-  IconButton,
-  Button,
-  useTheme,
-  useMediaQuery,
-} from '@mui/material'
-
-import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew'
-import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos'
+import { HiOutlineHeart, HiHeart } from 'react-icons/hi'
+import { HiChevronLeft, HiChevronRight } from 'react-icons/hi'
 
 import { productGetters } from '@/lib/getters'
 import type { Product } from '@/lib/gql/types'
 import { useCategoryProducts } from '@/hooks/custom/useCategoryProducts/useCategoryProducts'
 
-
-
-
 const DemoCategoryProductsPage: NextPage = () => {
-const [wishlist, setWishlist] = useState<string[]>([])
+  const [wishlist, setWishlist] = useState<string[]>([])
 
   const router = useRouter()
   const categoryCode = (router.query.categoryCode as string) || ''
@@ -43,30 +22,26 @@ const [wishlist, setWishlist] = useState<string[]>([])
 
   const scrollRef = useRef<HTMLDivElement | null>(null)
 
-  const theme = useTheme()
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'))
-  const isTablet = useMediaQuery(theme.breakpoints.between('sm', 'md'))
-
   const handleWishlistToggle = (productCode: string) => {
     setWishlist((prev) =>
       prev.includes(productCode)
-        ? prev.filter((code) => code !== productCode) // remove
-        : [...prev, productCode] // add
+        ? prev.filter((code) => code !== productCode)
+        : [...prev, productCode]
     )
   }
 
   const scroll = (direction: 'left' | 'right') => {
     if (!scrollRef.current) return
-  
+
     const container = scrollRef.current
     const firstCard = container.children[0] as HTMLElement
-  
+
     if (!firstCard) return
-  
+
     const cardWidth = firstCard.offsetWidth
-    const gap = 16 // because gap={2} in MUI = 16px
+    const gap = 16
     const scrollAmount = cardWidth + gap
-  
+
     container.scrollBy({
       left: direction === 'left' ? -scrollAmount : scrollAmount,
       behavior: 'smooth',
@@ -83,64 +58,51 @@ const [wishlist, setWishlist] = useState<string[]>([])
 
   if (isLoading) {
     return (
-      <Box p={4} display="flex" justifyContent="center">
-        <CircularProgress />
-      </Box>
+      <div className="p-6 flex justify-center">
+        <div
+          className="w-10 h-10 border-2 border-gray-300 border-t-blue-600 rounded-full animate-spin"
+          aria-label="Loading"
+        />
+      </div>
     )
   }
 
   if (isError || !data) {
     return (
-      <Box p={4}>
-        <Typography variant="h5">
+      <div className="p-6">
+        <h2 className="text-xl font-medium">
           Could not load products for this category.
-        </Typography>
-      </Box>
+        </h2>
+      </div>
     )
   }
 
   const products = data.items ?? []
 
   return (
-    <Box p={{ xs: 2, md: 6 }}>
-      <Typography variant="h4" mb={3}>
-        Products
-      </Typography>
+    <div className="p-4 md:p-6">
+      <h1 className="text-2xl md:text-3xl font-semibold mb-6">Products</h1>
 
-      <Box position="relative">
-        <IconButton
+      <div className="relative">
+        <button
+          type="button"
           onClick={() => scroll('left')}
-          sx={{
-            position: 'absolute',
-            left: 0,
-            top: '40%',
-            zIndex: 2,
-            background: '#fff',
-            boxShadow: 2,
-          }}
+          className="absolute left-0 top-[40%] z-10 bg-white shadow-md rounded-full p-2 hover:bg-gray-50"
         >
-          <ArrowBackIosNewIcon fontSize="small" />
-        </IconButton>
+          <HiChevronLeft className="w-5 h-5 text-gray-700" />
+        </button>
 
-        <IconButton
+        <button
+          type="button"
           onClick={() => scroll('right')}
-          sx={{
-            position: 'absolute',
-            right: 0,
-            top: '40%',
-            zIndex: 2,
-            background: '#fff',
-            boxShadow: 2,
-          }}
+          className="absolute right-0 top-[40%] z-10 bg-white shadow-md rounded-full p-2 hover:bg-gray-50"
         >
-          <ArrowForwardIosIcon fontSize="small" />
-        </IconButton>
+          <HiChevronRight className="w-5 h-5 text-gray-700" />
+        </button>
 
-        <Box
+        <div
           ref={scrollRef}
-          display="flex"
-          gap={2}
-          overflow="hidden"
+          className="flex gap-4 overflow-x-auto overflow-y-hidden scroll-smooth"
         >
           {products.map((product) => {
             const typedProduct = product as Product
@@ -150,144 +112,118 @@ const [wishlist, setWishlist] = useState<string[]>([])
             )
             const shortDescription =
               productGetters.getShortDescription(typedProduct)
-            const price = productGetters.getPrice(typedProduct)
+
+            const price = productGetters.getPrice(typedProduct) || {
+              regular: '',
+              special: '',
+            }
+
+            const isOnsale = price.special && price.special !== price.regular
 
             return (
-              <Box
+              <div
                 key={product?.productCode}
-                flex={{
-                  xs: '0 0 100%',
-                  sm: '0 0 50%',
-                  md: '0 0 24%',
-                }}
+                className="flex-shrink-0 w-full sm:w-[calc(90%-8px)] md:w-[24%] min-w-[200px]"
               >
-                <Card
-                  sx={{
-                    borderRadius: 4,
-                    boxShadow: 1,
-                    height: 380,
-                    display: 'flex',
-                    flexDirection: 'column',
-                    p: 1,
-                    mb: 2,
-                    mt: 2,
-                  }}
-                >
-                  <Box
-                    sx={{
-                      width: '100%',
-                      height: 170,
-                      display: 'flex',
-                      justifyContent: 'center',
-                      alignItems: 'center',
-                      backgroundColor: '#f5f5f5',
-                      borderRadius: 2,
-                      overflow: 'hidden',
-                    }}
-                  >
+                <div className="relative rounded-2xl shadow-lg border border-gray-100 flex flex-col p-3 my-2 bg-white transition-transform duration-300 ease-out transform-gpu hover:-translate-y-1 hover:scale-[1.01] hover:shadow-xl will-change-transform"> 
+
+                  
+                  <div className="relative w-full h-[190px] flex justify-center items-center bg-gray-200 rounded-xl overflow-hidden">
+
+                    {isOnsale && (
+                      <span className="absolute top-2 left-2 bg-red-600 text-white text-[10px] px-2 py-[2px] rounded-md font-semibold">
+                        SALE
+                      </span>
+                    )}
+
                     {imageUrl && (
-                      <CardMedia
-                        component="img"
-                        image={imageUrl}
+                      <img
+                        src={imageUrl}
                         alt={name}
-                        sx={{
-                          width: '100%',
-                          height: '100%',
-                          objectFit: 'contain',
-                        }}
+                        className="w-full h-full object-contain p-3"
                       />
                     )}
-                  </Box>
 
+                    {/* Wishlist */}
+                    <button
+                      type="button"
+                      onClick={() =>
+                        handleWishlistToggle(product?.productCode as string)
+                      }
+                      className="absolute top-2 right-2 bg-white rounded-full p-2 shadow hover:scale-110 transition"
+                    >
+                      {wishlist.includes(product?.productCode as string) ? (
+                        <HiHeart className="w-5 h-5 text-red-500" />
+                      ) : (
+                        <HiOutlineHeart className="w-5 h-5 text-gray-600" />
+                      )}
+                    </button>
+                  </div>
 
-                  <CardContent sx={{ p: 1, flexGrow: 1 }}>
-                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                      <Typography
-                        variant="subtitle2"
-                        fontWeight={600}
-                        noWrap
-                      >
-                        {name}
-                      </Typography>
+                  {/* PRODUCT INFO */}
+                  <div className="mt-3 flex flex-col flex-1">
 
-                      <Box
-                        onClick={() => handleWishlistToggle(product?.productCode as string)}
-                        sx={{
-                          cursor: 'pointer',
-                          display: 'flex',
-                          alignItems: 'center',
-                        }}
-                      >
-                        {wishlist.includes(product?.productCode as string) ? (
-                          <FavoriteIcon sx={{ color: 'red' }} />
-                        ) : (
-                          <FavoriteBorderOutlinedIcon />
-                        )}
-                      </Box>
-                    </Box>
-
+                    <h3 className="text-sm font-semibold text-gray-800">
+                      {name}
+                    </h3>
 
                     {shortDescription && (
-                      <Typography
-                        variant="body2"
-                        color="text.secondary"
-                        sx={{
-                          mt: 1,
-                          fontSize: 13,
-                          display: '-webkit-box',
-                          WebkitLineClamp: 2,
-                          WebkitBoxOrient: 'vertical',
-                          overflow: 'hidden',
-                        }}
+                      <div
+                        className="mt-2 text-xs text-gray-500 line-clamp-2"
                         dangerouslySetInnerHTML={{
                           __html: shortDescription,
                         }}
                       />
                     )}
 
-                    <Typography
-                      variant="subtitle1"
-                      fontWeight={700}
-                      sx={{ mt: 1 }}
-                    >
-                      $ {price.special || price.regular}
-                    </Typography>
+                    {/* PRICE */}
+                    <div className="mt-2 flex items-center gap-2">
+                      {isOnsale ? (
+                        <>
+                          <span className="text-base font-bold text-red-600">
+                            $ {price.special}
+                          </span>
 
-                    <Box
-                      mt={2}
-                      display="flex"
-                      gap={1}
-                      justifyContent="space-between"
-                    >
-                      <Button
-                        variant="outlined"
-                        size="small"
-                        fullWidth
+                          <span className="text-sm text-gray-500 line-through">
+                            $ {price.regular}
+                          </span>
+                        </>
+                      ) : (
+                        <span className="text-base font-bold">
+                          $ {price.regular}
+                        </span>
+                      )}
+                    </div>
+
+                    {/* BUTTONS */}
+                    <div className="mt-4 flex gap-2">
+                      <button
+                        type="button"
                         onClick={() =>
                           handleViewProduct(product?.productCode as string)
                         }
+                        className="flex-1 py-2 px-3 text-sm font-medium border border-gray-300 rounded-md hover:bg-gray-50"
                       >
                         View
-                      </Button>
+                      </button>
 
-                      <Button
-                        variant="contained"
-                        size="small"
-                        fullWidth
+                      <button
+                        type="button"
                         onClick={() => handleAddToCart(typedProduct)}
+                        className="flex-1 py-2 px-3 text-sm font-medium bg-orange-500 text-white rounded-md hover:bg-orange-600"
                       >
                         Add
-                      </Button>
-                    </Box>
+                      </button>
+                    </div>
 
-                  </CardContent>
-                </Card>
-              </Box>
+                  </div>
+                </div>
+              </div>
             )
           })}
-        </Box>
-      </Box>
-    </Box>
+        </div>
+      </div>
+    </div>
   )
 }
 
