@@ -102,7 +102,7 @@ const DemoCategoryProductsPage: NextPage = () => {
 
         <div
           ref={scrollRef}
-          className="flex gap-4 overflow-x-auto overflow-y-hidden scroll-smooth"
+          className="flex gap-4 overflow-x-auto overflow-y-hidden scroll-smooth snap-x snap-mandatory"
         >
           {products.map((product) => {
             const typedProduct = product as Product
@@ -123,9 +123,9 @@ const DemoCategoryProductsPage: NextPage = () => {
             return (
               <div
                 key={product?.productCode}
-                className="flex-shrink-0 w-full sm:w-[calc(90%-8px)] md:w-[24%] min-w-[200px]"
+                className="flex-shrink-0 w-full md:w-[calc((100%-1rem)/2)] lg:w-[calc((100%-3rem)/4)] min-w-0 snap-start"
               >
-                <div className="relative rounded-2xl shadow-lg border border-gray-100 flex flex-col p-3 my-2 bg-white transition-transform duration-300 ease-out transform-gpu hover:-translate-y-1 hover:scale-[1.01] hover:shadow-xl will-change-transform"> 
+                <div className="relative rounded-3xl shadow-lg border border-gray-100 flex flex-col p-3 my-2 bg-white transition-all duration-100 ease-out  hover:shadow-xl">
 
                   
                   <div className="relative w-full h-[190px] flex justify-center items-center bg-gray-200 rounded-xl overflow-hidden">
@@ -202,7 +202,7 @@ const DemoCategoryProductsPage: NextPage = () => {
                         onClick={() =>
                           handleViewProduct(product?.productCode as string)
                         }
-                        className="flex-1 py-2 px-3 text-sm font-medium border border-gray-300 rounded-md hover:bg-gray-50"
+                        className="flex-1 py-2 px-3 text-sm font-medium border border-gray-300 rounded-3xl hover:bg-gray-50"
                       >
                         View
                       </button>
@@ -210,7 +210,7 @@ const DemoCategoryProductsPage: NextPage = () => {
                       <button
                         type="button"
                         onClick={() => handleAddToCart(typedProduct)}
-                        className="flex-1 py-2 px-3 text-sm font-medium bg-orange-500 text-white rounded-md hover:bg-orange-600"
+                        className="flex-1 py-2 px-3 text-sm font-medium bg-orange-500 text-white rounded-3xl hover:bg-orange-600"
                       >
                         Add
                       </button>

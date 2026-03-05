@@ -1,6 +1,6 @@
 import React, { ReactElement, useEffect } from 'react'
 // import {CustomFooter} from '../Comp-by-tailwind/CustomFooter'
-import {CustomFooter} from '../Footer/CustomFooter'
+import {CustomFooter} from '../Comp-by-tailwind/CustomFooter'
 
 import { Container, Stack } from '@mui/material'
 import CssBaseline from '@mui/material/CssBaseline'
@@ -19,6 +19,7 @@ import {
   SnackbarRoot,
 } from '@/context'
 import theme from '@/styles/theme'
+import { CustomHeader } from '../Comp-by-tailwind/CustomHeader'
 
 creditCardType.updateCard('mastercard', {
   niceType: 'MC',
@@ -61,7 +62,7 @@ const DefaultLayout = ({ pageProps, children }: { pageProps: any; children: Reac
             <HeaderContextProvider>
               <GlobalFetchingIndicator />
               <Stack sx={{ minHeight: '100vh' }}>
-                <KiboHeader
+                {/* <KiboHeader
                   navLinks={[
                     {
                       link: '/order-status',
@@ -74,7 +75,8 @@ const DefaultLayout = ({ pageProps, children }: { pageProps: any; children: Reac
                   ]}
                   categoriesTree={pageProps.categoriesTree || []}
                   isSticky={true}
-                />
+                /> */}
+                <CustomHeader/>
                 <DialogRoot />
                 <SnackbarRoot />
                 <Container maxWidth={'xl'} sx={{ py: 2, flex: '1 0 auto' }}>
