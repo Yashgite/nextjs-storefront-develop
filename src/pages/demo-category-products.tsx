@@ -125,13 +125,13 @@ const DemoCategoryProductsPage: NextPage = () => {
                 key={product?.productCode}
                 className="flex-shrink-0 w-full md:w-[calc((100%-1rem)/2)] lg:w-[calc((100%-3rem)/4)] min-w-0 snap-start"
               >
-                <div className="relative rounded-3xl shadow-lg border border-gray-100 flex flex-col p-3 my-2 bg-white transition-all duration-100 ease-out  hover:shadow-xl">
+                <div className="relative rounded-3xl shadow-lg border border-gray-100 flex flex-col p-3 my-4 bg-white transition-all duration-300 ease-out hover:cursor-pointer">
 
                   
                   <div className="relative w-full h-[190px] flex justify-center items-center bg-gray-200 rounded-xl overflow-hidden">
 
                     {isOnsale && (
-                      <span className="absolute top-2 left-2 bg-red-600 text-white text-[10px] px-2 py-[2px] rounded-md font-semibold">
+                      <span className="absolute top-4 left-2 bg-red-600 text-white text-[10px] px-3 py-[3px] rounded-lg font-semibold">
                         SALE
                       </span>
                     )}

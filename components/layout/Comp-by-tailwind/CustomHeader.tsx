@@ -2,8 +2,6 @@
 
 import { useState, type FormEvent } from "react";
 import Link from "next/link";
-import Image from "next/image";
-import logo_Shopping from "@/public/logo_Shopping.png";
 
 const NAV_LINKS = [
     { label: "Home", href: "/" },
@@ -30,27 +28,14 @@ export const CustomHeader = () => {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 {/* Main bar */}
                 <div className="flex items-center justify-between gap-4 py-3 sm:py-4">
-                    {/* Logo */}
+                    {/* Brand text (replaces logo) */}
                     <Link
                         href="/"
                         className="shrink-0 flex items-center gap-2 sm:gap-3 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/60"
                     >
-                        <span className="relative w-80 h-20">
-                            <Image
-                                src={logo_Shopping}
-                                alt="My Storefront logo"
-                                fill
-                                priority
-                                
-                                className="object-contain"
-                            />
+                        <span className="text-lg sm:text-xl md:text-2xl font-extrabold tracking-tight text-white hover:text-amber-400 transition-colors duration-200 whitespace-nowrap">
+                            <span className="  text-amber-600">S</span>hopinity
                         </span>
-
-
-                        {/* <span className="hidden sm:inline text-lg md:text-xl font-bold tracking-tight text-white hover:text-amber-400 transition-colors duration-200">
-                            Shopify - Online Store
-                        </span> */}
-
                     </Link>
 
                     {/* Desktop search - centered, hidden on mobile */}
@@ -64,11 +49,11 @@ export const CustomHeader = () => {
                                 placeholder="Search products..."
                                 value={search}
                                 onChange={(e) => setSearch(e.target.value)}
-                                className="w-full pl-4 pr-10 py-2.5 rounded-lg bg-slate-800/80 border border-slate-700/50 text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500/50 transition-all duration-200"
+                                className="w-full pl-4 pr-10 py-2.5 rounded-3xl bg-slate-800/80 border border-slate-700/50 text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-500/50 focus:border-amber-500/50 transition-all duration-200"
                             />
                             <button
                                 type="submit"
-                                className="absolute right-1.5 top-1/2 -translate-y-1/2 p-1.5 rounded-md bg-amber-500/90 text-white hover:bg-amber-500 transition-colors duration-200"
+                                className="absolute right-1.5 top-1/2 -translate-y-1/2 p-1.5 rounded-2xl bg-amber-500/90 text-white hover:bg-amber-500 transition-colors duration-200"
                                 aria-label="Search"
                             >
                                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden>

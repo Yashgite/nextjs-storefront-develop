@@ -11,7 +11,7 @@ export const CustomFooter = () => {
         <div className="py-12 sm:py-14 lg:py-16">
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 sm:gap-10 lg:gap-12">
             {/* Brand column */}
-            <div className="sm:col-span-2 md:col-span-1">
+            <div className="sm:col-span-2 md:col-span-1 text-center md:text-left">
               <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight mb-4">
                 My Storefront
               </h2>
@@ -21,7 +21,7 @@ export const CustomFooter = () => {
             </div>
 
             {/* Quick Links */}
-            <div>
+            <div className="text-center md:text-left">
               <h3 className="text-sm font-semibold text-white uppercase tracking-wider mb-4">
                 Quick Links
               </h3>
@@ -40,7 +40,7 @@ export const CustomFooter = () => {
             </div>
 
             {/* Customer Service */}
-            <div>
+            <div className="text-center md:text-left">
               <h3 className="text-sm font-semibold text-white uppercase tracking-wider mb-4">
                 Customer Service
               </h3>
@@ -59,11 +59,11 @@ export const CustomFooter = () => {
             </div>
 
             {/* Follow Us - full width on small screens, then normal */}
-            <div className="sm:col-span-2 md:col-span-1">
+            <div className="sm:col-span-2 md:col-span-1 text-center md:text-left">
               <h3 className="text-sm font-semibold text-white uppercase tracking-wider mb-4">
                 Follow Us
               </h3>
-              <div className="flex flex-wrap gap-3 sm:gap-4">
+              <div className="flex flex-wrap justify-center md:justify-start gap-3 sm:gap-4">
                 {[
                   { name: "Facebook", label: "fb" },
                   { name: "Instagram", label: "ig" },
