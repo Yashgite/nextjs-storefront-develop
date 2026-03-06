@@ -1,101 +1,135 @@
+import Link from "next/link";
+
 export const CustomFooter = () => {
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-slate-950 text-slate-300 mt-auto">
-      {/* Top accent line */}
-      <div className="h-0.5 w-full bg-gradient-to-r from-amber-500/80 via-rose-500/60 to-amber-500/80" />
+    <footer className="bg-gradient-to-b from-white via-slate-50 to-slate-900 text-slate-300 mt-auto relative overflow-hidden">
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Main footer content */}
-        <div className="py-12 sm:py-14 lg:py-16">
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 sm:gap-10 lg:gap-12">
-            {/* Brand column */}
+      {/* gradient top line */}
+      {/* <div className="h-[2px] w-full bg-gradient-to-r from-amber-500 via-rose-500 to-amber-500" /> */}
+
+      {/* glow background */}
+        {/* <div className="absolute inset-0 opacity-20 pointer-events-none">
+          <div className="absolute -top-20 -left-20 w-72 h-72 bg-amber-500 blur-[120px]" />
+          <div className="absolute bottom-0 right-0 w-72 h-72 bg-rose-500 blur-[120px]" />
+        </div> */}
+
+      <div className="relative max-w-7xl mx-auto px-5 sm:px-6 lg:px-8">
+
+        {/* MAIN */}
+        <div className="pt-24 pb-12 sm:py-14 lg:py-16">
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-10">
+
+            {/* Brand */}
             <div className="sm:col-span-2 md:col-span-1 text-center md:text-left">
-              <h2 className="text-xl sm:text-2xl font-bold text-white tracking-tight mb-4">
-                My Storefront
+
+              <h2 className="text-2xl font-bold text-slate-900 mb-4">
+                Shopinity
+                <span className="block text-amber-500 text-sm mt-1">
+                  a online store
+                </span>
               </h2>
-              <p className="text-sm sm:text-base text-slate-400 leading-relaxed max-w-xs">
+
+              <p className="text-sm text-slate-900 max-w-xs mx-auto md:mx-0">
                 Your one-stop shop for quality products at the best prices.
               </p>
+
             </div>
 
-            {/* Quick Links */}
+            {/* Links */}
             <div className="text-center md:text-left">
-              <h3 className="text-sm font-semibold text-white uppercase tracking-wider mb-4">
+
+              <h3 className="text-sm font-semibold text-slate-900 uppercase mb-5">
                 Quick Links
               </h3>
+
               <ul className="space-y-3 text-sm">
-                {["Home", "Shop", "Categories", "Contact"].map((item) => (
+                {["Home","Shop","Categories","Contact"].map((item)=>(
                   <li key={item}>
-                    <a
+                    <Link
                       href="#"
-                      className="text-slate-400 hover:text-amber-400 transition-colors duration-200"
+                      className="text-slate-900  hover:text-amber-400 transition-all hover:translate-x-1 inline-block"
                     >
                       {item}
-                    </a>
+                    </Link>
                   </li>
                 ))}
               </ul>
+
             </div>
 
-            {/* Customer Service */}
+            {/* Service */}
             <div className="text-center md:text-left">
-              <h3 className="text-sm font-semibold text-white uppercase tracking-wider mb-4">
+
+              <h3 className="text-sm font-semibold text-slate-900 uppercase mb-5">
                 Customer Service
               </h3>
+
               <ul className="space-y-3 text-sm">
-                {["FAQ", "Returns", "Shipping", "Privacy Policy"].map((item) => (
+                {["FAQ","Returns","Shipping","Privacy Policy"].map((item)=>(
                   <li key={item}>
-                    <a
+                    <Link
                       href="#"
-                      className="text-slate-400 hover:text-amber-400 transition-colors duration-200"
+                      className="text-slate-900 hover:text-amber-400 transition-all hover:translate-x-1 inline-block"
                     >
                       {item}
-                    </a>
+                    </Link>
                   </li>
                 ))}
               </ul>
+
             </div>
 
-            {/* Follow Us - full width on small screens, then normal */}
+            {/* Social */}
             <div className="sm:col-span-2 md:col-span-1 text-center md:text-left">
-              <h3 className="text-sm font-semibold text-white uppercase tracking-wider mb-4">
+
+              <h3 className="text-sm font-semibold text-slate-900 uppercase mb-5">
                 Follow Us
               </h3>
-              <div className="flex flex-wrap justify-center md:justify-start gap-3 sm:gap-4">
-                {[
-                  { name: "Facebook", label: "fb" },
-                  { name: "Instagram", label: "ig" },
-                  { name: "Twitter", label: "tw" },
-                ].map(({ name, label }) => (
-                  <a
-                    key={label}
+
+              <div className="flex flex-wrap justify-center md:justify-start gap-4">
+
+                {["Facebook","Instagram","Twitter"].map((name)=>(
+                  <Link
+                    key={name}
                     href="#"
-                    className="inline-flex items-center justify-center min-w-[2.5rem] h-10 px-3 rounded-lg bg-slate-800/80 text-slate-400 hover:bg-amber-500/20 hover:text-amber-400 border border-slate-700/50 hover:border-amber-500/30 transition-all duration-200 text-sm font-medium"
+                    className="flex items-center justify-center px-4 h-10 rounded-xl bg-white/5 backdrop-blur-md border border-white/10 text-slate-900 hover:text-amber-400 hover:border-amber-400 transition-all duration-300 text-sm"
                   >
                     {name}
-                  </a>
+                  </Link>
                 ))}
+
               </div>
+
             </div>
+
           </div>
+
         </div>
 
-        {/* Bottom bar */}
-        <div className="border-t border-slate-800 py-5 sm:py-6">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-slate-500">
+        {/* Bottom */}
+        <div className="border-t border-white/10 py-6">
+
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-white">
+
             <p>© {currentYear} My Storefront. All rights reserved.</p>
-            <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-1">
-              <a href="#" className="hover:text-amber-400 transition-colors duration-200">
-                Terms of Service
-              </a>
-              <a href="#" className="hover:text-amber-400 transition-colors duration-200">
+
+            <div className="flex gap-6">
+              <Link href="#" className="hover:text-amber-400 transition">
+                Terms
+              </Link>
+
+              <Link href="#" className="hover:text-amber-400 transition">
                 Privacy
-              </a>
+              </Link>
             </div>
+
           </div>
+
         </div>
+
       </div>
     </footer>
   );

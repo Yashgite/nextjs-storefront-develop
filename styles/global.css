@@ -3,6 +3,10 @@
 @tailwind components;
 @tailwind utilities;
 
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
 /* Make clicks pass-through */
 #nprogress {
   pointer-events: none;

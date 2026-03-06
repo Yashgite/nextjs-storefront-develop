@@ -81,7 +81,18 @@ const DemoCategoryProductsPage: NextPage = () => {
 
   return (
     <div className="p-4 md:p-6">
-      <h1 className="text-2xl md:text-3xl font-semibold mb-6">Products</h1>
+      <div className="mb-8 max-w-3xl">
+  <h1 className="text-2xl md:text-3xl font-semibold mb-3">
+    Discover Trendy <span className="text-amber-500">Shoes</span> and 
+    <span className="text-amber-500"> Fashion</span> for Every Style
+  </h1>
+
+  <p className="text-gray-500 text-sm md:text-base">
+    Explore our latest collection of comfortable shoes and stylish clothing designed 
+    to elevate your everyday look. From casual wear to standout pieces, find the 
+    perfect combination of comfort, quality, and modern fashion.
+  </p>
+</div>
 
       <div className="relative">
         <button
@@ -102,7 +113,7 @@ const DemoCategoryProductsPage: NextPage = () => {
 
         <div
           ref={scrollRef}
-          className="flex gap-4 overflow-x-auto overflow-y-hidden scroll-smooth snap-x snap-mandatory"
+          className="flex gap-4 overflow-x-auto overflow-y-hidden scroll-smooth snap-x snap-mandatory hide-scrollbar"
         >
           {products.map((product) => {
             const typedProduct = product as Product
@@ -125,7 +136,7 @@ const DemoCategoryProductsPage: NextPage = () => {
                 key={product?.productCode}
                 className="flex-shrink-0 w-full md:w-[calc((100%-1rem)/2)] lg:w-[calc((100%-3rem)/4)] min-w-0 snap-start"
               >
-                <div className="relative rounded-3xl shadow-lg border border-gray-100 flex flex-col p-3 my-4 bg-white transition-all duration-300 ease-out hover:cursor-pointer">
+                <div className="relative rounded-3xl shadow-lg border-none flex flex-col p-3 my-4 bg-white transition-all duration-300 ease-out hover:cursor-pointer">
 
                   
                   <div className="relative w-full h-[190px] flex justify-center items-center bg-gray-200 rounded-xl overflow-hidden">

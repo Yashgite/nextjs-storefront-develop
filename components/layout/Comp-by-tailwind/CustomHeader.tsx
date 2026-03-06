@@ -1,12 +1,14 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import Link from "next/link";
+
+import type { Maybe, PrCategory } from "@/lib/gql/types";
+import { useGetCategoryTree } from "@/hooks";
 
 const NAV_LINKS = [
     { label: "Home", href: "/" },
     { label: "Shop", href: "/" },
-    { label: "Categories", href: "/" },
     { label: "Contact", href: "/" },
 ];
 
@@ -14,11 +16,85 @@ export const CustomHeader = () => {
     const [search, setSearch] = useState("");
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
+    const [categoriesOpen, setCategoriesOpen] = useState(false);
+    const [mobileCategoriesOpen, setMobileCategoriesOpen] = useState(false);
+    const categoriesMenuRef = useRef<HTMLDivElement | null>(null);
+
+    const { data: categoryTree, isLoading: isCategoryLoading } = useGetCategoryTree([]);
+
+    const displayedCategories = useMemo(
+        () => (categoryTree || []).filter((c) => Boolean(c?.isDisplayed)),
+        [categoryTree]
+    );
+
+    const getIndentClass = (depth: number) => {
+        if (depth <= 0) return "";
+        if (depth === 1) return "pl-3";
+        if (depth === 2) return "pl-6";
+        return "pl-8";
+    };
+
+    const renderCategoryLinks = (
+        categories: Maybe<PrCategory>[],
+        depth: number,
+        onSelect: () => void,
+        variant: "desktop" | "mobile"
+    ) => {
+        const cats = (categories || []).filter(Boolean);
+        return cats.map((category) => {
+            const name = category?.content?.name || category?.categoryCode || "Category";
+            const href = category?.categoryCode ? `/category/${category.categoryCode}` : "#";
+            const key = category?.categoryId || category?.categoryCode || name;
+            const children = (category?.childrenCategories || []).filter((c) => Boolean(c?.isDisplayed));
+
+            return (
+                <div key={String(key)} className={depth > 0 ? `border-l border-slate-800/80 ml-2 ${getIndentClass(depth)}` : ""}>
+                    <Link
+                        href={href}
+                        onClick={onSelect}
+                        className={
+                            variant === "desktop"
+                                ? "block rounded-md px-3 py-2 text-sm text-slate-200 hover:bg-slate-800/60 hover:text-amber-400 transition-colors"
+                                : "block rounded-md px-3 py-2.5 text-sm text-slate-200 hover:bg-slate-800/60 hover:text-amber-400 transition-colors"
+                        }
+                    >
+                        {name}
+                    </Link>
+
+                    {children?.length ? (
+                        <div className={variant === "desktop" ? "pb-1" : "pb-2"}>
+                            {renderCategoryLinks(children as Maybe<PrCategory>[], depth + 1, onSelect, variant)}
+                        </div>
+                    ) : null}
+                </div>
+            );
+        });
+    };
 
     const handleSearch = (e: FormEvent) => {
         e.preventDefault();
         if (search.trim()) console.log("Searching for:", search);
     };
+
+    useEffect(() => {
+        if (!categoriesOpen) return;
+        const onPointerDown = (e: MouseEvent | TouchEvent) => {
+            if (!categoriesMenuRef.current) return;
+            if (categoriesMenuRef.current.contains(e.target as Node)) return;
+            setCategoriesOpen(false);
+        };
+        const onKeyDown = (e: KeyboardEvent) => {
+            if (e.key === "Escape") setCategoriesOpen(false);
+        };
+        document.addEventListener("mousedown", onPointerDown);
+        document.addEventListener("touchstart", onPointerDown);
+        document.addEventListener("keydown", onKeyDown);
+        return () => {
+            document.removeEventListener("mousedown", onPointerDown);
+            document.removeEventListener("touchstart", onPointerDown);
+            document.removeEventListener("keydown", onKeyDown);
+        };
+    }, [categoriesOpen]);
 
     return (
         <header className="sticky top-0 z-50 w-full bg-slate-950 text-white shadow-lg shadow-black/20">
@@ -28,7 +104,7 @@ export const CustomHeader = () => {
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 {/* Main bar */}
                 <div className="flex items-center justify-between gap-4 py-3 sm:py-4">
-                    {/* Brand text (replaces logo) */}
+                    {/* website name*/}
                     <Link
                         href="/"
                         className="shrink-0 flex items-center gap-2 sm:gap-3 rounded-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-amber-500/60"
@@ -74,6 +150,50 @@ export const CustomHeader = () => {
                                 {label}
                             </Link>
                         ))}
+
+                        {/* Categories dropdown */}
+                        <div className="relative" ref={categoriesMenuRef}>
+                            <button
+                                type="button"
+                                onClick={() => setCategoriesOpen((o) => !o)}
+                                className="px-3 py-2 rounded-lg text-sm font-medium text-slate-300 hover:text-amber-400 hover:bg-slate-800/50 transition-all duration-200 inline-flex items-center gap-1"
+                                aria-haspopup="menu"
+                                aria-expanded={categoriesOpen}
+                            >
+                                Categories
+                                <svg
+                                    className={`w-4 h-4 transition-transform ${categoriesOpen ? "rotate-180" : ""}`}
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                    aria-hidden
+                                >
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </button>
+
+                            {categoriesOpen ? (
+                                <div
+                                    role="menu"
+                                    className="absolute right-0 mt-2 w-80 lg:w-96 rounded-xl border border-slate-800/80 bg-slate-900/95 backdrop-blur-sm shadow-xl shadow-black/30 overflow-hidden"
+                                >
+                                    <div className="max-h-[70vh] overflow-auto p-2">
+                                        {isCategoryLoading ? (
+                                            <div className="px-3 py-2 text-sm text-slate-400">Loading categories…</div>
+                                        ) : displayedCategories.length ? (
+                                            renderCategoryLinks(
+                                                displayedCategories as Maybe<PrCategory>[],
+                                                0,
+                                                () => setCategoriesOpen(false),
+                                                "desktop"
+                                            )
+                                        ) : (
+                                            <div className="px-3 py-2 text-sm text-slate-400">No categories found.</div>
+                                        )}
+                                    </div>
+                                </div>
+                            ) : null}
+                        </div>
                     </nav>
 
                     {/* Mobile: search toggle + hamburger */}
@@ -151,6 +271,48 @@ export const CustomHeader = () => {
                                 </Link>
                             </li>
                         ))}
+
+                        <li>
+                            <button
+                                type="button"
+                                onClick={() => setMobileCategoriesOpen((o) => !o)}
+                                className="w-full flex items-center justify-between px-4 py-3 rounded-lg text-slate-300 hover:text-amber-400 hover:bg-slate-800/50 transition-colors duration-200 font-medium"
+                                aria-expanded={mobileCategoriesOpen}
+                            >
+                                <span>Categories</span>
+                                <svg
+                                    className={`w-5 h-5 transition-transform ${mobileCategoriesOpen ? "rotate-180" : ""}`}
+                                    fill="none"
+                                    stroke="currentColor"
+                                    viewBox="0 0 24 24"
+                                    aria-hidden
+                                >
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </button>
+
+                            <div className={`pl-2 pr-1 ${mobileCategoriesOpen ? "max-h-[60vh] opacity-100" : "max-h-0 opacity-0 overflow-hidden"} transition-all duration-300 ease-out`}>
+                                <div className="mt-1 mb-2 rounded-lg border border-slate-800/80 bg-slate-950/30 overflow-auto max-h-[60vh]">
+                                    {isCategoryLoading ? (
+                                        <div className="px-4 py-3 text-sm text-slate-400">Loading categories…</div>
+                                    ) : displayedCategories.length ? (
+                                        <div className="p-1">
+                                            {renderCategoryLinks(
+                                                displayedCategories as Maybe<PrCategory>[],
+                                                0,
+                                                () => {
+                                                    setMobileMenuOpen(false);
+                                                    setMobileCategoriesOpen(false);
+                                                },
+                                                "mobile"
+                                            )}
+                                        </div>
+                                    ) : (
+                                        <div className="px-4 py-3 text-sm text-slate-400">No categories found.</div>
+                                    )}
+                                </div>
+                            </div>
+                        </li>
                     </ul>
                 </nav>
             </div>
