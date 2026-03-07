@@ -98,7 +98,7 @@ const DemoCategoryProductsPage: NextPage = () => {
         <button
           type="button"
           onClick={() => scroll('left')}
-          className="absolute left-0 top-[40%] z-10 bg-white shadow-md rounded-full p-2 hover:bg-gray-50"
+          className="absolute left-0 top-[40%] z-10 bg-white shadow-md rounded-full p-2 hover:bg-amber-100"
         >
           <HiChevronLeft className="w-5 h-5 text-gray-700" />
         </button>
@@ -106,7 +106,7 @@ const DemoCategoryProductsPage: NextPage = () => {
         <button
           type="button"
           onClick={() => scroll('right')}
-          className="absolute right-0 top-[40%] z-10 bg-white shadow-md rounded-full p-2 hover:bg-gray-50"
+          className="absolute right-0 top-[40%] z-10 bg-white shadow-md rounded-full p-2 hover:bg-amber-100"
         >
           <HiChevronRight className="w-5 h-5 text-gray-700" />
         </button>
