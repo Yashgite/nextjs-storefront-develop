@@ -5,7 +5,8 @@ import Link from "next/link";
 import { useRouter } from "next/router";
 
 import type { Maybe, PrCategory } from "@/lib/gql/types";
-import { useGetCategoryTree } from "@/hooks";
+import { useGetCart, useGetCategoryTree, useGetWishlist } from "@/hooks";
+import { cartGetters } from "@/lib/getters";
 
 const NAV_LINKS = [
     { label: "Home", href: "/" },
@@ -23,6 +24,13 @@ export const CustomHeader = () => {
     const categoriesMenuRef = useRef<HTMLDivElement | null>(null);
 
     const { data: categoryTree, isLoading: isCategoryLoading } = useGetCategoryTree([]);
+    const { data: cart } = useGetCart();
+    const { data: wishlist } = useGetWishlist();
+
+    const cartItemCount = cartGetters.getCartItemCount(cart);
+    const wishlistItemCount = Array.isArray((wishlist as any)?.items)
+        ? (wishlist as any).items.length
+        : ((wishlist as any)?.items?.length ?? 0);
 
     const displayedCategories = useMemo(
         () => (categoryTree || []).filter((c) => Boolean(c?.isDisplayed)),
@@ -160,15 +168,32 @@ export const CustomHeader = () => {
 
                     {/* Desktop nav */}
                     <nav className="hidden md:flex items-center gap-1">
-                        {NAV_LINKS.map(({ label, href }) => (
-                            <Link
-                                key={label}
-                                href={href}
-                                className="px-3 py-2 rounded-lg text-sm font-medium text-slate-300 hover:text-amber-400 hover:bg-slate-800/50 transition-all duration-200"
-                            >
-                                {label}
-                            </Link>
-                        ))}
+                        {NAV_LINKS.map(({ label, href }) => {
+                            const isCart = href === "/cart";
+                            const isWishlist = href === "/wishlist";
+                            const showCartBadge = isCart && cartItemCount > 0;
+                            const showWishlistBadge = isWishlist && wishlistItemCount > 0;
+
+                            return (
+                                <Link
+                                    key={label}
+                                    href={href}
+                                    className="relative px-3 py-2 rounded-lg text-sm font-medium text-slate-300 hover:text-amber-400 hover:bg-slate-800/50 transition-all duration-200 flex items-center gap-1"
+                                >
+                                    <span>{label}</span>
+                                    {showCartBadge && (
+                                        <span className="inline-flex items-center justify-center min-w-[1.25rem] h-5 rounded-full bg-amber-500 text-[0.7rem] font-semibold text-slate-950 px-1.5">
+                                            {cartItemCount}
+                                        </span>
+                                    )}
+                                    {showWishlistBadge && (
+                                        <span className="inline-flex items-center justify-center min-w-[1.25rem] h-5 rounded-full bg-amber-500 text-[0.7rem] font-semibold text-slate-950 px-1.5">
+                                            {wishlistItemCount}
+                                        </span>
+                                    )}
+                                </Link>
+                            );
+                        })}
 
                         {/* Categories dropdown */}
                         <div className="relative" ref={categoriesMenuRef}>
@@ -279,17 +304,34 @@ export const CustomHeader = () => {
             >
                 <nav className="max-w-7xl mx-auto px-4 sm:px-6 py-4">
                     <ul className="flex flex-col gap-1">
-                        {NAV_LINKS.map(({ label, href }) => (
-                            <li key={label}>
-                                <Link
-                                    href={href}
-                                    onClick={() => setMobileMenuOpen(false)}
-                                    className="block px-4 py-3 rounded-lg text-slate-300 hover:text-amber-400 hover:bg-slate-800/50 transition-colors duration-200 font-medium"
-                                >
-                                    {label}
-                                </Link>
-                            </li>
-                        ))}
+                        {NAV_LINKS.map(({ label, href }) => {
+                            const isCart = href === "/cart";
+                            const isWishlist = href === "/wishlist";
+                            const showCartBadge = isCart && cartItemCount > 0;
+                            const showWishlistBadge = isWishlist && wishlistItemCount > 0;
+
+                            return (
+                                <li key={label}>
+                                    <Link
+                                        href={href}
+                                        onClick={() => setMobileMenuOpen(false)}
+                                        className="flex items-center justify-between px-4 py-3 rounded-lg text-slate-300 hover:text-amber-400 hover:bg-slate-800/50 transition-colors duration-200 font-medium"
+                                    >
+                                        <span>{label}</span>
+                                        {showCartBadge && (
+                                            <span className="inline-flex items-center justify-center min-w-[1.35rem] h-5 rounded-full bg-amber-500 text-[0.7rem] font-semibold text-slate-950 px-1.5">
+                                                {cartItemCount}
+                                            </span>
+                                        )}
+                                        {showWishlistBadge && (
+                                            <span className="inline-flex items-center justify-center min-w-[1.35rem] h-5 rounded-full bg-amber-500 text-[0.7rem] font-semibold text-slate-950 px-1.5">
+                                                {wishlistItemCount}
+                                            </span>
+                                        )}
+                                    </Link>
+                                </li>
+                            );
+                        })}
 
                         <li>
                             <button

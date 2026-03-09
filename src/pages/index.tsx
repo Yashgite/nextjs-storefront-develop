@@ -5,7 +5,7 @@ import { serverSideTranslations } from '@/lib/helpers/serverSideTranslations'
 import type { CategoryTreeResponse, NextPageWithLayout } from '@/lib/types'
 
 import type { GetStaticPropsContext } from 'next'
-import DemoCategoryProductsPage from './demo-category-products'
+import CustomHomePage from './CustomHomePage'
 
 interface HomePageProps {
   carouselItem: any
@@ -28,7 +28,7 @@ const Home: NextPageWithLayout<HomePageProps> = (props) => {
   return (
     <>
       {/* <KiboHeroCarousel carouselItem={carouselItem || []}></KiboHeroCarousel> */}
-      <DemoCategoryProductsPage/>
+      <CustomHomePage/>
     </>
   )
 }

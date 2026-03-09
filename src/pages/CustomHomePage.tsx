@@ -1,34 +1,64 @@
-// src/pages/demo-category-products.tsx
-import { useState, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/router'
 import { NextPage } from 'next'
 import { HiOutlineHeart, HiHeart } from 'react-icons/hi'
 import { HiChevronLeft, HiChevronRight } from 'react-icons/hi'
 
+import { useProductCardActions } from '@/hooks/custom/useProductCardActions/useProductCardActions'
 import { productGetters } from '@/lib/getters'
 import type { Product } from '@/lib/gql/types'
-import { useCategoryProducts } from '@/hooks/custom/useCategoryProducts/useCategoryProducts'
+import { FulfillmentOptions } from '@/lib/constants'
+import { useGetAllProducts } from '@/hooks/custom/useGetAllProducts/useGetAllProducts'
 
-const DemoCategoryProductsPage: NextPage = () => {
-  const [wishlist, setWishlist] = useState<string[]>([])
-
+const CustomHomePage: NextPage = () => {
   const router = useRouter()
-  const categoryCode = (router.query.categoryCode as string) || ''
+  // const categoryCode = (router.query.categoryCode as string) || ''
 
-  const { data, isLoading, isError } = useCategoryProducts({
-    categoryCode,
+  const { handleAddToCart, handleWishList, checkProductInWishlist, isATCLoading } =
+    useProductCardActions()
+
+  const [canScrollLeft, setCanScrollLeft] = useState(false)
+  const [canScrollRight, setCanScrollRight] = useState(false)
+
+  //Fetch products from API
+  const { data, isLoading, isError } = useGetAllProducts({
+    // categoryCode,
     pageSize: 20,
   })
 
+//This stores reference of div element so js can control scrolling
   const scrollRef = useRef<HTMLDivElement | null>(null)
 
-  const handleWishlistToggle = (productCode: string) => {
-    setWishlist((prev) =>
-      prev.includes(productCode)
-        ? prev.filter((code) => code !== productCode)
-        : [...prev, productCode]
-    )
+  const products = data?.items ?? []
+
+  function updateScrollButtons() {
+    const el = scrollRef.current
+    if (!el) return
+
+    const maxScrollLeft = el.scrollWidth - el.clientWidth
+    const current = el.scrollLeft
+    const epsilon = 1
+
+    setCanScrollLeft(current > epsilon)
+    setCanScrollRight(maxScrollLeft - current > epsilon)
   }
+
+  useEffect(() => {
+    const el = scrollRef.current
+    if (el) el.scrollTo({ left: 0 })
+
+    const id = window.requestAnimationFrame(updateScrollButtons)
+    return () => window.cancelAnimationFrame(id)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [products.length])
+
+  useEffect(() => {
+    updateScrollButtons()
+    const handleResize = () => updateScrollButtons()
+    window.addEventListener('resize', handleResize)
+    return () => window.removeEventListener('resize', handleResize)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const scroll = (direction: 'left' | 'right') => {
     if (!scrollRef.current) return
@@ -46,10 +76,10 @@ const DemoCategoryProductsPage: NextPage = () => {
       left: direction === 'left' ? -scrollAmount : scrollAmount,
       behavior: 'smooth',
     })
-  }
 
-  const handleAddToCart = (product: Product) => {
-    console.log('Add to cart:', product)
+    // smooth scroll may not settle immediately; re-evaluate after it progresses
+    window.requestAnimationFrame(updateScrollButtons)
+    window.setTimeout(updateScrollButtons, 250)
   }
 
   const handleViewProduct = (productCode: string) => {
@@ -77,28 +107,28 @@ const DemoCategoryProductsPage: NextPage = () => {
     )
   }
 
-  const products = data.items ?? []
-
   return (
     <div className="p-4 md:p-6">
       <div className="mb-8 max-w-3xl">
-  <h1 className="text-2xl md:text-3xl font-semibold mb-3">
-    Discover Trendy <span className="text-amber-500">Shoes</span> and 
-    <span className="text-amber-500"> Fashion</span> for Every Style
-  </h1>
+        <h1 className="text-2xl md:text-3xl font-semibold mb-3">
+          Discover Trendy <span className="text-amber-500">Shoes</span> and
+          <span className="text-amber-500"> Fashion</span> for Every Style
+        </h1>
 
-  <p className="text-gray-500 text-sm md:text-base">
-    Explore our latest collection of comfortable shoes and stylish clothing designed 
-    to elevate your everyday look. From casual wear to standout pieces, find the 
-    perfect combination of comfort, quality, and modern fashion.
-  </p>
-</div>
+        <p className="text-gray-500 text-sm md:text-base">
+          Explore our latest collection of comfortable shoes and stylish clothing designed
+          to elevate your everyday look. From casual wear to standout pieces, find the
+          perfect combination of comfort, quality, and modern fashion.
+        </p>
+      </div>
 
       <div className="relative">
         <button
           type="button"
           onClick={() => scroll('left')}
-          className="absolute left-0 top-[40%] z-10 bg-white shadow-md rounded-full p-2 hover:bg-amber-100"
+          disabled={!canScrollLeft}
+          aria-disabled={!canScrollLeft}
+          className="absolute left-0 top-[40%] z-10 bg-white shadow-md rounded-full p-2 hover:bg-amber-100 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white"
         >
           <HiChevronLeft className="w-5 h-5 text-gray-700" />
         </button>
@@ -106,18 +136,21 @@ const DemoCategoryProductsPage: NextPage = () => {
         <button
           type="button"
           onClick={() => scroll('right')}
-          className="absolute right-0 top-[40%] z-10 bg-white shadow-md rounded-full p-2 hover:bg-amber-100"
+          disabled={!canScrollRight}
+          aria-disabled={!canScrollRight}
+          className="absolute right-0 top-[40%] z-10 bg-white shadow-md rounded-full p-2 hover:bg-amber-100 disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white"
         >
           <HiChevronRight className="w-5 h-5 text-gray-700" />
         </button>
 
         <div
           ref={scrollRef}
+          onScroll={updateScrollButtons}
           className="flex gap-4 overflow-x-auto overflow-y-hidden scroll-smooth snap-x snap-mandatory hide-scrollbar"
         >
           {products.map((product) => {
             const typedProduct = product as Product
-            const name = productGetters.getName(typedProduct)
+            const name = productGetters.getName(typedProduct)             //Extract product details
             const imageUrl = productGetters.handleProtocolRelativeUrl(
               productGetters.getCoverImage(typedProduct)
             )
@@ -130,15 +163,22 @@ const DemoCategoryProductsPage: NextPage = () => {
             }
 
             const isOnsale = price.special && price.special !== price.regular
+            const productCode = productGetters.getProductId(typedProduct) as string
+            const variationProductCode = productGetters.getVariationProductCode(typedProduct) as string
+            const isInWishlist = checkProductInWishlist({
+              productCode,
+              variationProductCode,
+            })
+            const isVariationProduct = productGetters.isVariationProduct(typedProduct)
 
-            return (
+            return (  
               <div
                 key={product?.productCode}
                 className="flex-shrink-0 w-full md:w-[calc((100%-1rem)/2)] lg:w-[calc((100%-3rem)/4)] min-w-0 snap-start"
               >
-                <div className="relative rounded-3xl shadow-lg border-none flex flex-col p-3 my-4 bg-white transition-all duration-300 ease-out hover:cursor-pointer">
+                <div className="relative rounded-3xl shadow-lg border-none flex flex-col p-3 my-4 bg-white transition-all duration-300 ease-out hover:cursor-pointer hover:shadow-2xl hover:shadow-amber-200">
 
-                  
+
                   <div className="relative w-full h-[190px] flex justify-center items-center bg-gray-200 rounded-xl overflow-hidden">
 
                     {isOnsale && (
@@ -158,12 +198,11 @@ const DemoCategoryProductsPage: NextPage = () => {
                     {/* Wishlist */}
                     <button
                       type="button"
-                      onClick={() =>
-                        handleWishlistToggle(product?.productCode as string)
-                      }
+                      onClick={() => handleWishList(typedProduct as any)}
                       className="absolute top-2 right-2 bg-white rounded-full p-2 shadow hover:scale-110 transition"
+                      aria-label={isInWishlist ? 'Remove from wishlist' : 'Add to wishlist'}
                     >
-                      {wishlist.includes(product?.productCode as string) ? (
+                      {isInWishlist ? (
                         <HiHeart className="w-5 h-5 text-red-500" />
                       ) : (
                         <HiOutlineHeart className="w-5 h-5 text-gray-600" />
@@ -220,8 +259,25 @@ const DemoCategoryProductsPage: NextPage = () => {
 
                       <button
                         type="button"
-                        onClick={() => handleAddToCart(typedProduct)}
-                        className="flex-1 py-2 px-3 text-sm font-medium bg-orange-500 text-white rounded-3xl hover:bg-orange-600"
+                        onClick={async () => {
+                          if (isVariationProduct) return handleViewProduct(productCode)
+                          await handleAddToCart({
+                            product: {
+                              productCode,
+                              variationProductCode,
+                              fulfillmentMethod: typedProduct?.fulfillmentTypesSupported?.includes(
+                                FulfillmentOptions.DIGITAL
+                              )
+                                ? FulfillmentOptions.DIGITAL
+                                : FulfillmentOptions.SHIP,
+                              purchaseLocationCode: '',
+                              options: (typedProduct?.options as any) || [],
+                            },
+                            quantity: 1,
+                          })
+                        }}
+                        disabled={isATCLoading}
+                        className="flex-1 py-2 px-3 text-sm font-medium bg-orange-500 text-white rounded-3xl hover:bg-orange-600 disabled:opacity-60 disabled:cursor-not-allowed"
                       >
                         Add
                       </button>
@@ -238,4 +294,4 @@ const DemoCategoryProductsPage: NextPage = () => {
   )
 }
 
-export default DemoCategoryProductsPage
+export default CustomHomePage

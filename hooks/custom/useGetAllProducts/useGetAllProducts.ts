@@ -38,7 +38,7 @@ const fetchCategoryProducts = async (params: UseCategoryProductsParams) => {
   return response?.products
 }
 
-export const useCategoryProducts = (
+export const useGetAllProducts = (
   params: UseCategoryProductsParams
 ): UseCategoryProductsResult => {
   const { categoryCode } = params
