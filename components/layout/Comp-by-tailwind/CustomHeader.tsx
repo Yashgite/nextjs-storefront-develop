@@ -2,17 +2,19 @@
 
 import { useEffect, useMemo, useRef, useState, type FormEvent } from "react";
 import Link from "next/link";
+import { useRouter } from "next/router";
 
 import type { Maybe, PrCategory } from "@/lib/gql/types";
 import { useGetCategoryTree } from "@/hooks";
 
 const NAV_LINKS = [
     { label: "Home", href: "/" },
-    { label: "Shop", href: "/" },
-    { label: "Contact", href: "/" },
+    { label: "Cart", href: "/cart" },
+    { label: "Wishlist", href: "/wishlist" },
 ];
 
 export const CustomHeader = () => {
+    const router = useRouter();
     const [search, setSearch] = useState("");
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [mobileSearchOpen, setMobileSearchOpen] = useState(false);
@@ -73,8 +75,25 @@ export const CustomHeader = () => {
 
     const handleSearch = (e: FormEvent) => {
         e.preventDefault();
-        if (search.trim()) console.log("Searching for:", search);
+        const q = search.trim();
+        if (!q) return;
+
+        setMobileSearchOpen(false);
+        setMobileMenuOpen(false);
+        setCategoriesOpen(false);
+        setMobileCategoriesOpen(false);
+
+        router.push({
+            pathname: "/search",
+            query: { search: q },
+        });
     };
+
+    useEffect(() => {
+        if (router.pathname === "/") {
+            setSearch("");
+        }
+    }, [router.pathname]);
 
     useEffect(() => {
         if (!categoriesOpen) return;
