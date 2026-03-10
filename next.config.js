@@ -35,9 +35,9 @@ module.exports = {
   publicRuntimeConfig: {
     currentUrl: process.env.CURRENT_DOMAIN,
     metaData: {
-      siteTitle: 'Kibo Commerce',
-      defaultTitle: 'Storefront',
-      defaultDescription: 'Kibo Commerce Storefront',
+      siteTitle: 'Shopinity',
+      defaultTitle: 'Ecommerce',
+      defaultDescription: 'Shopinity Commerce Storefront',
     },
     recaptcha: {
       reCaptchaKey: process.env.RECAPTCHA_KEY,
